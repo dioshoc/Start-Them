@@ -21,8 +21,7 @@ const rsync = require('gulp-rsync')
 const del = require('del')
 const webp = require('gulp-webp')
 const webphtml = require('gulp-webp-html')
-//const webpcss = require('gulp-webpcss')
-
+const webpcss = require('gulp-webp-css')
 
 function browsersync() {
 	browserSync.init({
@@ -73,8 +72,9 @@ function styles() {
 	return src([`app/styles/${preprocessor}/*.*`, `!app/styles/${preprocessor}/_*.*`])
 		.pipe(eval(`${preprocessor}glob`)())
 		.pipe(eval(preprocessor)())
+		.pipe(webpcss())
 		.pipe(autoprefixer({ overrideBrowserslist: ['last 10 versions'], grid: true }))
-		.pipe(cleancss({ level: { 1: { specialComments: 0 } },/* format: 'beautify' */ }))
+		.pipe(cleancss({ level: { 1: { specialComments: 0 } }, /* format: 'beautify' */ }))
 		//.pipe(rename({ suffix: ".min" }))
 		.pipe(dest('app/../'))
 		.pipe(browserSync.stream())
@@ -88,6 +88,7 @@ function imagesWebP() {
 				quality: 70
 			})
 		)
+
 		.pipe(dest('app/images/dist'))
 		.pipe(browserSync.stream())
 }
