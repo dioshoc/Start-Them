@@ -69,7 +69,7 @@ function script() {
 }
 
 function styles() {
-	return src([`app/styles/${preprocessor}/*.*`, `!app/styles/${preprocessor}/_*.*`])
+	return src([`app/${preprocessor}/*.*`, `!app/${preprocessor}/_*.*`])
 		.pipe(eval(`${preprocessor}glob`)())
 		.pipe(eval(preprocessor)())
 		.pipe(webpcss())
@@ -81,21 +81,20 @@ function styles() {
 }
 
 function imagesWebP() {
-	return src(['app/images/src/**/*'])
-		.pipe(newer('app/images/dist'))
+	return src(['app/img/**/*'])
+		.pipe(newer('images/**/*'))
 		.pipe(
 			webp({
 				quality: 70
 			})
 		)
-
-		.pipe(dest('app/images/dist'))
+		.pipe(dest('images/'))
 		.pipe(browserSync.stream())
 }
 
 function images() {
-	return src(['app/images/src/**/*'])
-		.pipe(newer('app/images/dist'))
+	return src(['app/img/**/*'])
+		.pipe(newer('images/**/*'))
 		.pipe(
 			imagemin({
 				progressive: true,
@@ -104,7 +103,7 @@ function images() {
 				optimizationLevel: 3,
 			})
 		)
-		.pipe(dest('app/images/dist'))
+		.pipe(dest('images/'))
 		.pipe(browserSync.stream())
 }
 function buildcopy() {
@@ -144,9 +143,9 @@ function deploy() {
 }
 
 function startwatch() {
-	watch(`app/styles/${preprocessor}/**/*`, { usePolling: true }, styles)
+	watch(`app/${preprocessor}/**/*`, { usePolling: true }, styles)
 	watch(['app/js/**/*.js', '!app/js/**/*.min.js'], { usePolling: true }, scripts)
-	watch('app/images/src/**/*.{jpg,jpeg,png,webp,svg,gif}', { usePolling: true }, images)
+	watch('app/img/**/*.{jpg,jpeg,png,webp,svg,gif}', { usePolling: true }, images)
 	watch(`**/*.{${fileswatch}}`, { usePolling: true }).on('change', browserSync.reload)
 }
 
