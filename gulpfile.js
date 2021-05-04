@@ -1,5 +1,5 @@
 let preprocessor = 'sass', // Preprocessor (sass, less, styl); 'sass' also work with the Scss syntax in blocks/ folder.
-	fileswatch = 'html,htm,txt,json,md,woff2,php' // List of files extensions for watching & hard reload
+	fileswatch = 'html,htm,txt,json,md,woff2,php,js' // List of files extensions for watching & hard reload
 
 const { src, dest, parallel, series, watch } = require('gulp')
 const browserSync = require('browser-sync').create()
@@ -19,6 +19,10 @@ const imagemin = require('gulp-imagemin')
 const newer = require('gulp-newer')
 const rsync = require('gulp-rsync')
 const del = require('del')
+const webp = require('gulp-webp')
+const webphtml = require('gulp-webp-html')
+//const webpcss = require('gulp-webpcss')
+
 
 function browsersync() {
 	browserSync.init({
@@ -26,6 +30,13 @@ function browsersync() {
 		host: "test.local",
 		open: "external",
 	})
+}
+
+function html() {
+	return src(['app/../*.php', 'app/../*.html'])
+		.pipe(webphtml())
+		.pipe(browserSync.stream())
+		.pipe(dest('app/../'))
 }
 
 function scripts() {
@@ -53,6 +64,10 @@ function scripts() {
 		.pipe(dest('app/../js'))
 		.pipe(browserSync.stream())
 }
+function script() {
+	return src('app/../js/*.js')
+		.pipe(browserSync.stream())
+}
 
 function styles() {
 	return src([`app/styles/${preprocessor}/*.*`, `!app/styles/${preprocessor}/_*.*`])
@@ -65,14 +80,32 @@ function styles() {
 		.pipe(browserSync.stream())
 }
 
-function images() {
+function imagesWebP() {
 	return src(['app/images/src/**/*'])
 		.pipe(newer('app/images/dist'))
-		.pipe(imagemin())
+		.pipe(
+			webp({
+				quality: 70
+			})
+		)
 		.pipe(dest('app/images/dist'))
 		.pipe(browserSync.stream())
 }
 
+function images() {
+	return src(['app/images/src/**/*'])
+		.pipe(newer('app/images/dist'))
+		.pipe(
+			imagemin({
+				progressive: true,
+				svgoPluginus: [{ removeVievBox: false }],
+				interlaced: true,
+				optimizationLevel: 3,
+			})
+		)
+		.pipe(dest('app/images/dist'))
+		.pipe(browserSync.stream())
+}
 function buildcopy() {
 	return src([
 		'{app/js,app/css}/*.min.*',
@@ -116,10 +149,14 @@ function startwatch() {
 	watch(`**/*.{${fileswatch}}`, { usePolling: true }).on('change', browserSync.reload)
 }
 
+
+exports.script = script
+exports.html = html
 exports.scripts = scripts
 exports.styles = styles
+exports.imagesWebP = imagesWebP
 exports.images = images
 exports.deploy = deploy
-exports.assets = series(scripts, styles, images)
+exports.assets = series(scripts, styles, imagesWebP, images)
 exports.build = series(cleandist, scripts, styles, images, buildcopy, buildhtml)
-exports.default = series(scripts, styles, images, parallel(browsersync, startwatch))
+exports.default = series(html, scripts, styles, imagesWebP, images, parallel(browsersync, startwatch))
