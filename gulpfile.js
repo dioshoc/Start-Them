@@ -1,5 +1,5 @@
 let preprocessor = 'sass', // Preprocessor (sass, less, styl); 'sass' also work with the Scss syntax in blocks/ folder.
-	fileswatch = 'html,htm,txt,json,md,woff2,php,js' // List of files extensions for watching & hard reload
+	fileswatch = 'html,htm,txt,json,md,woff2,js,php' // List of files extensions for watching & hard reload
 
 const { src, dest, parallel, series, watch } = require('gulp')
 const browserSync = require('browser-sync').create()
@@ -32,9 +32,10 @@ function browsersync() {
 }
 
 function html() {
-	return src(['app/../*.php', 'app/../*.html'])
+	return src(['app/*.html'])
 		.pipe(webphtml())
 		.pipe(browserSync.stream())
+		.pipe(rename('index.php'))
 		.pipe(dest('app/../'))
 }
 
@@ -81,8 +82,8 @@ function styles() {
 }
 
 function imagesWebP() {
-	return src(['app/img/**/*'])
-		.pipe(newer('images/**/*'))
+	return src(['app/img/**/*', '../../uploads/**/*'])
+		.pipe(newer('images/**/*', '../../uploads/**/*'))
 		.pipe(
 			webp({
 				quality: 70
@@ -93,8 +94,8 @@ function imagesWebP() {
 }
 
 function images() {
-	return src(['app/img/**/*'])
-		.pipe(newer('images/**/*'))
+	return src(['app/img/**/*', '../../uploads/**/*'])
+		.pipe(newer('images/**/*', '../../uploads/**/*'))
 		.pipe(
 			imagemin({
 				progressive: true,
@@ -145,10 +146,9 @@ function deploy() {
 function startwatch() {
 	watch(`app/${preprocessor}/**/*`, { usePolling: true }, styles)
 	watch(['app/js/**/*.js', '!app/js/**/*.min.js'], { usePolling: true }, scripts)
-	watch('app/img/**/*.{jpg,jpeg,png,webp,svg,gif}', { usePolling: true }, images)
-	watch(`**/*.{${fileswatch}}`, { usePolling: true }).on('change', browserSync.reload)
+	watch('images/**/*.{jpg,jpeg,png,webp,svg,gif}', { usePolling: true }, images)
+	watch(`app/**/*.{${fileswatch}}`, { usePolling: true }).on('change', browserSync.reload)
 }
-
 
 exports.script = script
 exports.html = html
