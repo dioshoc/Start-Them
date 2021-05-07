@@ -149,6 +149,7 @@ function startwatch() {
 	watch('images/**/*.{jpg,jpeg,png,webp,svg,gif}', { usePolling: true }, images)
 	watch(`**/*.{${fileswatch}}`, { usePolling: true }).on('change', browserSync.reload)
 	//watch(`app/*.html`, { usePolling: true }, html)
+
 }
 
 
