@@ -1,1 +1,32 @@
-<?php/** * The main template file * * @package Them */get_header();?><main id="primary" class="site-main">    <?php    if (have_posts()) :        if (is_home() && !is_front_page()) :    ?>    <header>        <h1 class="page-title screen-reader-text"><?php single_post_title(); ?></h1>    </header>    <?php        endif;        /* Start the Loop */        while (have_posts()) :            the_post();            get_template_part('template-parts/content', get_post_type());        endwhile;        the_posts_navigation();    else :        get_template_part('template-parts/content', 'none');    endif;    ?></main><!-- #main --><?phpget_sidebar();get_footer();
+<?php
+
+/**
+ * The template for displaying all pages
+ *
+ * @package Them
+ */
+
+get_header();
+?>
+
+<main id="primary" class="site-main">
+
+    <?php
+    while (have_posts()) :
+        the_post();
+
+        get_template_part('template-parts/content', 'page');
+
+        // If comments are open or we have at least one comment, load up the comment template.
+        if (comments_open() || get_comments_number()) :
+            comments_template();
+        endif;
+
+    endwhile; // End of the loop.
+    ?>
+
+</main><!-- #main -->
+
+<?php
+get_sidebar();
+get_footer();
