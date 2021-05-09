@@ -31,16 +31,20 @@ function browsersync() {
 	})
 }
 
-function html() {
-	return src('app/*.html')
+function php() {
+	return src('**/*.php')
+		.pipe(dest('app/../'))
+		.pipe(browserSync.stream())
+}
+function phpbuild() {
+	return src('**/*.php')
 		.pipe(webphtml())
 		.pipe(dest('app/../'))
 		.pipe(browserSync.stream())
 }
-
 function scripts() {
 	return src(['app/js/*.js', '!app/js/*.min.js'])
-		.pipe(webpack({
+		/* .pipe(webpack({
 			mode: 'production',
 			performance: { hints: false },
 			module: {
@@ -58,8 +62,8 @@ function scripts() {
 			}
 		})).on('error', function handleError() {
 			this.emit('end')
-		})
-		.pipe(rename('main.js'))
+		}) */
+		//.pipe(rename('main.js'))
 		.pipe(dest('app/../js'))
 		.pipe(browserSync.stream())
 }
@@ -80,21 +84,17 @@ function styles() {
 		.pipe(browserSync.stream())
 }
 
-function imagesWebP() {
+function images() {
 	return src(['app/img/**/*', '../../uploads/**/*'])
-		.pipe(newer('images/**/*'))
+		.pipe(newer('images/'))
 		.pipe(
 			webp({
 				quality: 70
 			})
 		)
 		.pipe(dest('images/'))
-		.pipe(browserSync.stream())
-}
-
-function images() {
-	return src(['app/img/**/*', '../../uploads/**/*'])
-		.pipe(newer('images/**/*', '../../uploads/**/*'))
+		.pipe(src(['app/img/**/*', '../../uploads/**/*']))
+		.pipe(newer('images/'))
 		.pipe(
 			imagemin({
 				progressive: true,
@@ -106,25 +106,7 @@ function images() {
 		.pipe(dest('images/'))
 		.pipe(browserSync.stream())
 }
-function buildcopy() {
-	return src([
-		'{app/js,app/css}/*.min.*',
-		'app/images/**/*.*',
-		'!app/images/src/**/*',
-		'app/fonts/**/*'
-	], { base: 'app/' })
-		.pipe(dest('dist'))
-}
 
-async function buildhtml() {
-	let includes = new ssi('app/', 'dist/', '/**/*.html')
-	includes.compile()
-	del('dist/parts', { force: true })
-}
-
-function cleandist() {
-	return del('dist/**/*', { force: true })
-}
 
 function deploy() {
 	return src('dist/')
@@ -143,23 +125,17 @@ function deploy() {
 }
 
 function startwatch() {
-	watch('app/*.html', { usePolling: true }, html)
 	watch(`app/${preprocessor}/**/*`, { usePolling: true }, styles)
 	watch(['app/js/**/*.js', '!app/js/**/*.min.js'], { usePolling: true }, scripts)
 	watch('images/**/*.{jpg,jpeg,png,webp,svg,gif}', { usePolling: true }, images)
 	watch(`**/*.{${fileswatch}}`, { usePolling: true }).on('change', browserSync.reload)
-	//watch(`app/*.html`, { usePolling: true }, html)
-
 }
 
-
+exports.php = php
 exports.script = script
-exports.html = html
 exports.scripts = scripts
 exports.styles = styles
-exports.imagesWebP = imagesWebP
 exports.images = images
 exports.deploy = deploy
-exports.assets = series(scripts, styles, imagesWebP, images)
-exports.build = series(cleandist, scripts, styles, images, buildcopy, buildhtml)
-exports.default = series(html, scripts, styles, imagesWebP, images, parallel(browsersync, startwatch))
+exports.build = series(scripts, styles, images, phpbuild)
+exports.default = series(php, scripts, styles, images, parallel(browsersync, startwatch))
