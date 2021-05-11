@@ -4,25 +4,24 @@ $accent: orange // Accent Color
 $fontsize: 16px // Body Font Size
 $textcolor: #333 // Text Color
 $lineheight: 1.65 // Document Line Height
-$userfont: roboto-oh5, sans-serif // User Font Family
+$userfont: roboto, sans-serif // User Font Family
 $systemfont: -apple-system, BlinkMacSystemFont, Arial, sans-serif // System Font Family
 
 //Main container
-$maxwidth: none
-
-// FONTS LOAD SECTION
+$maxwidth: 1140px
 
 @mixin font($fname, $fstyle, $fweight, $furl)
 	@font-face
 		font-family: $fname
 		font-style: $fstyle
 		font-weight: $fweight
-		src: url($furl) format('woff2')
+		src: url($furl)
 
-@include font('roboto', normal, 400, 'fonts/roboto-regular-webfont.woff2')
-@include font('roboto', italic, 400, 'fonts/roboto-italic-webfont.woff2')
-@include font('roboto', normal, 700, 'fonts/roboto-bold-webfont.woff2')
-@include font('roboto', italic, 700, 'fonts/roboto-bolditalic-webfont.woff2')
+@include font('roboto', normal, 400, 'fonts/Roboto-Regular.ttf')
+@include font('roboto', normal, 700, 'fonts/Roboto-Italic.ttf')
+@include font('roboto', italic, 400, 'fonts/Roboto-Medium.ttf')
+@include font('coming', normal, 400, 'fonts/Roboto-MediumItalic.ttf')
+@include font('roboto', italic, 700, 'fonts/Roboto-Bold.ttf')
 
 // GENERAL DOCUMENT STYLES
 
@@ -57,11 +56,3 @@ footer > div
 	max-width: $maxwidth
 	width: 100%
 	margin: 0 auto
-
-.main-navigation ul
-	display: flex
-	justify-content: space-between
-	padding: 0px
-
-.main-navigation ul li
-	list-style-type: none

@@ -44,31 +44,7 @@ function phpbuild() {
 }
 function scripts() {
 	return src(['app/js/*.js', '!app/js/*.min.js'])
-		/* .pipe(webpack({
-			mode: 'production',
-			performance: { hints: false },
-			module: {
-				rules: [
-					{
-						test: /\.(js)$/,
-						exclude: /(node_modules)/,
-						loader: 'babel-loader',
-						query: {
-							presets: ['@babel/env'],
-							plugins: ['babel-plugin-root-import']
-						}
-					}
-				]
-			}
-		})).on('error', function handleError() {
-			this.emit('end')
-		}) */
-		//.pipe(rename('main.js'))
 		.pipe(dest('app/../js'))
-		.pipe(browserSync.stream())
-}
-function script() {
-	return src('app/../js/*.js')
 		.pipe(browserSync.stream())
 }
 
@@ -132,7 +108,6 @@ function startwatch() {
 }
 
 exports.php = php
-exports.script = script
 exports.scripts = scripts
 exports.styles = styles
 exports.images = images
